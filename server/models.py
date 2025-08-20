@@ -5,7 +5,7 @@ db = SQLAlchemy()
 # Define Models here
 
 class Exercise(db.Model):
-  __tablename__ = 'exercises'
+  __tablename__ = "exercises"
 
   id = db.Column(db.Integer, primary_key=True)
   name = db.Column(db.String, nullable=False, unique=True)
@@ -16,7 +16,7 @@ class Exercise(db.Model):
     return f"<Exercise {self.name}>"
   
 class Workout(db.Model):
-  __tablename__ = 'workouts'
+  __tablename__ = "workouts"
 
   id = db.Column(db.Integer, primary_key=True)
   date = db.Column(db.Date, nullable=False)
@@ -25,3 +25,16 @@ class Workout(db.Model):
 
   def __repr__(self):
     return f"<Workout {self.id} ({self.date})>"
+  
+class WorkoutExercise(db.Model):
+  __tablename__ = "workout_exercises"
+
+  id = db.Column(db.Integer, primary_key=True)
+  workout_id = db.Column(db.Integer, db.ForeignKey("workouts.id"), nullable=False)
+  exercise_id = db.Column(db.Integer, db.ForeignKey("exercises.id"), nullable=False)
+  reps = db.Column(db.Integer)
+  sets = db.Column(db.Integer)
+  duration_seconds = db.Column(db.Integer)
+
+  def __repr__(self):
+    return f"<Workout:{self.workout_id}, Exercise:{self.exercise_id}>"
