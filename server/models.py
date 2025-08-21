@@ -14,7 +14,7 @@ class Exercise(db.Model):
     equipment_needed = db.Column(db.Boolean, nullable=False)
 
     workout_exercises = db.relationship("WorkoutExercise", backref="exercise", cascade="all, delete")
-    workouts = db.relationship("Workout", secondary="workout_exercises", back_populates="exercises")
+    workouts = db.relationship("Workout", secondary="workout_exercises", back_populates="exercises", viewonly=True)
 
     @validates('name')
     def validate_name(self, key, value):
@@ -34,7 +34,7 @@ class Workout(db.Model):
     notes = db.Column(db.Text)
 
     workout_exercises = db.relationship("WorkoutExercise", backref="workout", cascade="all, delete")
-    exercises = db.relationship("Exercise", secondary="workout_exercises", back_populates="workouts")
+    exercises = db.relationship("Exercise", secondary="workout_exercises", back_populates="workouts", viewonly=True)
 
     __table_args__ = (
         CheckConstraint("duration_minutes >= 0"),
