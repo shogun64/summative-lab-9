@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import validates
+from sqlalchemy import CheckConstraint
 db = SQLAlchemy()
 
 # Define Models here
@@ -15,6 +16,12 @@ class Exercise(db.Model):
     workout_exercises = db.relationship("WorkoutExercise", backref="exercise", cascade="all, delete")
     workouts = db.relationship("Workout", secondary="workout_exercises", back_populates="exercises")
 
+    @validates('name')
+    def validate_name(self, key, value):
+        if not value or not value.strip():
+            raise ValueError("Exercise name empty")
+        return value
+
     def __repr__(self):
         return f"<Exercise {self.name}>"
   
@@ -29,6 +36,16 @@ class Workout(db.Model):
     workout_exercises = db.relationship("WorkoutExercise", backref="workout", cascade="all, delete")
     exercises = db.relationship("Exercise", secondary="workout_exercises", back_populates="workouts")
 
+    __table_args__ = (
+        CheckConstraint("duration_minutes >= 0"),
+    )
+
+    @validates('duration_minutes')
+    def validate_duration(self, key, value):
+        if value <= 0:
+            raise ValueError("Duration must be positive")
+        return value
+
     def __repr__(self):
         return f"<Workout {self.id} ({self.date})>"
   
@@ -41,6 +58,18 @@ class WorkoutExercise(db.Model):
     reps = db.Column(db.Integer)
     sets = db.Column(db.Integer)
     duration_seconds = db.Column(db.Integer)
+
+    __table_args__ = (
+        CheckConstraint('reps >= 0'),
+        CheckConstraint('sets >= 0'),
+        CheckConstraint('duration_seconds >= 0'),
+    )
+
+    @validates('reps', 'sets', 'duration_seconds')
+    def validate_positive(self, key, value):
+        if value < 0:
+            raise ValueError(f"{key} must be positive")
+        return value
 
     def __repr__(self):
         return f"<Workout:{self.workout_id}, Exercise:{self.exercise_id}>"
