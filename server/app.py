@@ -17,7 +17,7 @@ workouts_schema = WorkoutSchema(many=True)
 workout_exercise_schema = WorkoutExerciseSchema()
 workout_exercises_schema = WorkoutExerciseSchema(many=True)
 
-@app.route('/workouts', method=['GET'])
+@app.route('/workouts', methods=['GET'])
 def get_workouts():
     workouts = Workout.query.all()
     return jsonify(workouts_schema.dump(workouts)), 200
