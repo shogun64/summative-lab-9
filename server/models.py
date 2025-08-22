@@ -86,6 +86,11 @@ class WorkoutSchema(Schema):
     notes = fields.Str()
     workout_exercises = fields.Nested(lambda: WorkoutExerciseSchema, many=True)
 
+    @validates('duration_minutes')
+    def validate_duration(self, value):
+        if value < 0:
+            raise ValueError("Duration must be positive")
+
 class WorkoutExerciseSchema(Schema):
     id = fields.Int(dump_only=True)
     workout_id = fields.Int(required=True)
@@ -93,3 +98,8 @@ class WorkoutExerciseSchema(Schema):
     reps = fields.Int()
     sets = fields.Int()
     duration_seconds = fields.Int()
+
+    @validates('reps', 'sets', 'duration_seconds')
+    def validate_positive(self, key, value):
+        if value < 0:
+            raise ValueError(f"{key} must be positive")
