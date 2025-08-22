@@ -1,9 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import validates
 from sqlalchemy import CheckConstraint
+from marshmallow import Schema, fields
 db = SQLAlchemy()
-
-# Define Models here
 
 class Exercise(db.Model):
     __tablename__ = "exercises"
@@ -73,3 +72,24 @@ class WorkoutExercise(db.Model):
 
     def __repr__(self):
         return f"<Workout:{self.workout_id}, Exercise:{self.exercise_id}>"
+    
+class ExerciseSchema(Schema):
+    id = fields.Int(dump_only=True)
+    name = fields.Str(required=True)
+    category = fields.Str(required=True)
+    equipment_needed = fields.Bool(required=True)
+
+class WorkoutSchema(Schema):
+    id = fields.Int(dump_only=True)
+    date = fields.Date(required=True)
+    duration_minutes = fields.Int(required=True)
+    notes = fields.Str()
+    workout_exercises = fields.Nested(lambda: WorkoutExerciseSchema, many=True)
+
+class WorkoutExerciseSchema(Schema):
+    id = fields.Int(dump_only=True)
+    workout_id = fields.Int(required=True)
+    exercise_id = fields.Int(required=True)
+    reps = fields.Int()
+    sets = fields.Int()
+    duration_seconds = fields.Int()
