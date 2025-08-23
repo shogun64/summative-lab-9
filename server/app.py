@@ -17,7 +17,7 @@ workouts_schema = WorkoutSchema(many=True)
 workout_exercise_schema = WorkoutExerciseSchema()
 workout_exercises_schema = WorkoutExerciseSchema(many=True)
 
-@app.route('/workouts', method=['GET'])
+@app.route('/workouts', methods=['GET'])
 def get_workouts():
     workouts = Workout.query.all()
     return jsonify(workouts_schema.dump(workouts)), 200
@@ -34,7 +34,8 @@ def get_workout(id):
 def create_workout():
     data = request.get_json()
     try:
-        workout = workout_schema.load(data)
+        schema = workout_schema.load(data)
+        workout = Workout(**schema)
         db.session.add(workout)
         db.session.commit()
         return jsonify(workout_schema.dump(workout)), 201
@@ -69,7 +70,8 @@ def get_exercise(id):
 def create_exercise():
     data = request.get_json()
     try:
-        exercise = exercise_schema.load(data)
+        schema = exercise_schema.load(data)
+        exercise = Exercise(**schema)
         db.session.add(exercise)
         db.session.commit()
         return jsonify(exercise_schema.dump(exercise)), 201
@@ -99,7 +101,8 @@ def add_exercise_to_workout(workout_id, exercise_id):
     data["workout_id"] = workout_id
     data["exercise_id"] = exercise_id
     try:
-        workout_exercise = workout_exercise_schema.load(data)
+        schema = workout_exercise_schema.load(data)
+        workout_exercise = WorkoutExercise(**schema)
         db.session.add(workout_exercise)
         db.session.commit()
         return jsonify(workout_exercise_schema.dump(workout_exercise)), 201
